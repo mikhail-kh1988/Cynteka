@@ -1,26 +1,22 @@
 package com.test;
 
-import org.apache.commons.lang3.StringUtils;
+
+import java.io.*;
 import java.util.ArrayList;
 
 public class Main {
 
     private static ArrayList<String> nArray = new ArrayList<>();
     private static ArrayList<String> mArray = new ArrayList<>();
-    private static ArrayList<String> result = new ArrayList<>();
+    private static StringBuilder result = new StringBuilder();
 
     public static void main(String[] args) {
 
-        getTwoArrayFromString(TestString.INPUT);
+        getTwoArrayFromFile(readFile("input.txt"));
 
-        printArray(nArray);
-        printArray(mArray);
-        System.out.println("RESULT: -> ");
-        deleteEmptyElements(nArray);
-        deleteEmptyElements(mArray);
         compareArray(nArray, mArray);
-        printArray(result);
 
+        writeFile(result.toString());
 
     }
 
@@ -40,7 +36,7 @@ public class Main {
         return false;
     }
 
-    public static void getTwoArrayFromString(String string){
+    public static void getTwoArrayFromFile(String string){
         String[] strings = string.split("\n");
 
         int count = 0;
@@ -58,13 +54,6 @@ public class Main {
         }
     }
 
-    public static void printArray(ArrayList<String> arrayList){
-
-        for (String s:arrayList) {
-            System.out.println(s);
-        }
-    }
-
 
     public static void deleteEmptyElements(ArrayList<String> arrayList){
         arrayList.remove(0);
@@ -76,6 +65,8 @@ public class Main {
     }
 
     public static void compareArray(ArrayList<String> first, ArrayList<String> second){
+        deleteEmptyElements(first);
+        deleteEmptyElements(second);
         for (String s: first) {
             String temp = "\n";
             temp += s+":";
@@ -84,16 +75,55 @@ public class Main {
                     temp = temp+ss;
                 }
             }
-            result.add(temp);
+            result.append(temp);
 
         }
     }
 
     public static boolean compareStrings(String first, String second){
-        if (StringUtils.contains(first, second)){
-            return true;
+        String[] firstArray = first.split(" ");
+        String[] secondArray = second.split(" ");
+        for (String s: firstArray) {
+            for (String ss:secondArray) {
+                if (s.contains(ss)){
+                    return true;
+                }
+            }
         }
+
         return false;
+    }
+
+    public static String readFile(String fileName){
+        String file = "";
+
+        try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            file = sb.toString();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return file;
+    }
+
+    public static void writeFile(String output){
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"));
+            writer.write(output);
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
